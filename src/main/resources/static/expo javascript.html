@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Name, Gender, and Order ID Input</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0 15px 0;
+      box-sizing: border-box;
+    }
+
+    input[type="radio"] {
+      margin-right: 5px;
+    }
+
+    button {
+      background-color: #4caf50;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+
+</head>
+<body>
+
+  <label for="nameInput">Naam:</label>
+  <input type="text" id="nameInput" placeholder="Geef uw naam hier">
+
+  <br>
+
+  <label>Kies uw ticket:</label>
+  <br>
+  <input type="radio" id="juniorDag" name="ticket" value="1">
+  <label for="juniorDag">Junior Dag</label>
+
+  <input type="radio" id="seniorDag" name="ticket" value="2">
+  <label for="seniorDag">Senior Dag</label>
+
+  <input type="radio" id="allIn" name="ticket" value="3">
+  <label for="allIn">All-In</label>
+
+  <br>
+
+  <button onclick="displayInfo()">Submit</button>
+
+  <br>
+
+  <label for="orderID">Order ID:</label>
+  <textarea id="orderID" rows="4" cols="50" readonly></textarea>
+  <script>
+    function displayInfo() {
+
+      var name = document.getElementById('nameInput').value;
+      var ticketType = document.querySelector('input[name="ticket"]:checked').value;
+
+      console.log('Name:', name);
+      console.log('Ticket Type:', ticketType);
+
+      var data = { name: name, ticketType: ticketType };
+
+      console.log('Data:', data);
+
+      fetch('http://localhost:8080/bestelling/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+
+        },
+        body: JSON.stringify(data)
+      })
+              .then(response => {
+                if (!response.ok) {
+                  return response.text().then(errorText => {
+                    console.error('Request failed:', errorText);
+                    throw new Error('Request failed');
+                  });
+                }
+                return response.json();
+              })
+              .then(data => {
+                console.log('Response:', data);
+                var orderId = data.id;
+                document.getElementById('orderID').value = 'Uw order id is: ' + orderId;
+              })
+              .catch((error) => {
+                console.error('Error:', error);
+              });
+    }
+    </script>
+</body>
+</html>
